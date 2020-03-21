@@ -1,0 +1,68 @@
+{
+  "name": "vimeo-full-stack-developer-hiring-challenge-2020",
+  "version": "0.1.0",
+  "private": true,
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run build:check"
+    }
+  },
+  "dependencies": {
+    "classnames": "^2.2.6",
+    "primeflex": "^1.0.0",
+    "primeicons": "^2.0.0",
+    "primereact": "^4.1.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-scripts": "3.4.1",
+    "react-transition-group": "^4.3.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^7.2.1",
+    "@types/jest": "^24.9.1",
+    "@types/node": "^12.12.30",
+    "@types/react": "^16.9.25",
+    "@types/react-dom": "^16.9.5",
+    "firebase-tools": "^7.15.1",
+    "husky": "^4.2.3",
+    "npm-run-all": "^4.1.5",
+    "onchange": "^6.1.0",
+    "prettier": "^1.19.1",
+    "tslint": "^6.1.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.2.0",
+    "typescript": "^3.7.5"
+  },
+  "scripts": {
+    "start": "npm-run-all --parallel prettier:watch react:start",
+    "build:check": "npm-run-all lint:check prettier:check",
+    "build": "npm-run-all build:check react:build",
+    "deploy": "npm-run-all build firebase:deploy",
+    "react:build": "react-scripts build",
+    "react:test": "react-scripts test",
+    "react:eject": "react-scripts eject",
+    "react:start": "react-scripts start",
+    "lint:check": "tslint 'src/**/*.{ts,tsx}'",
+    "prettier:check": "prettier --check src/**/*.{ts,tsx,json,css}",
+    "prettier:write": "prettier --write src/**/*.{ts,tsx,json,css}",
+    "prettier:watch": "onchange 'src/**/*.{ts,tsx,json,css}' -- prettier --write {{changed}}",
+    "firebase:deploy": "firebase deploy --project hackathons-007"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

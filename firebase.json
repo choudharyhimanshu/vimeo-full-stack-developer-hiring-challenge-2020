@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "TODO",
+    "site": "transaction-statement",
     "public": "build",
     "ignore": [
       "firebase.json",

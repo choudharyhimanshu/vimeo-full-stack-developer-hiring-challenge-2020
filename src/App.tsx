@@ -1,5 +1,6 @@
 import React from 'react';
 
+import 'semantic-ui-css/semantic.min.css';
 import 'primereact/resources/themes/nova-light/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeflex/primeflex.css';
@@ -7,13 +8,16 @@ import 'primeicons/primeicons.css';
 import './css/helper.css';
 import './App.css';
 
-import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
+import { DataView } from 'primereact/dataview';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Dropdown } from 'primereact/dropdown';
+import { Growl } from 'primereact/growl';
 
 import { ISearchItem } from './models/search-item';
 
 import searchService from './services/search.service';
+import SearchListItem from './components/SearchListItem';
+import { Breadcrumb } from 'semantic-ui-react';
 
 interface IAppState {
     isLoading: boolean;
@@ -24,12 +28,17 @@ interface IAppState {
 }
 
 class App extends React.Component<{}, IAppState> {
+    growl: any;
+
     constructor(props: {}) {
         super(props);
 
         this.state = {
             items: [],
-            isLoading: false
+            isLoading: false,
+            sortKey: '!transactionDate',
+            sortField: 'transactionDate',
+            sortOrder: -1
         };
 
         this.onSortChange = this.onSortChange.bind(this);
@@ -55,11 +64,21 @@ class App extends React.Component<{}, IAppState> {
 
     fetchItems() {
         this.setState({ isLoading: true }, () => {
-            searchService.fetchAllItems().then(response => {
-                setTimeout(() => {
-                    this.setState({ isLoading: false, items: response });
-                }, 1000);
-            });
+            searchService
+                .fetchAllItems()
+                .then(response => {
+                    setTimeout(() => {
+                        this.setState({ isLoading: false, items: response });
+                    }, 1000);
+                })
+                .catch(error => {
+                    this.growl.show({
+                        severity: 'error',
+                        summary: 'Error occurred fetching statement',
+                        detail: error.toString()
+                    });
+                    this.setState({ isLoading: false });
+                });
         });
     }
 
@@ -69,8 +88,10 @@ class App extends React.Component<{}, IAppState> {
 
     renderHeader() {
         const sortOptions = [
-            { label: 'Newest First', value: 'id' },
-            { label: 'Oldest First', value: '!id' }
+            { label: 'Oldest Transactions', value: 'transactionDate' },
+            { label: 'Newest Transactions', value: '!transactionDate' },
+            { label: 'Withdraw Amount', value: '!withdrawAmount' },
+            { label: 'Deposit Amount', value: '!depositAmount' }
         ];
 
         return (
@@ -89,17 +110,11 @@ class App extends React.Component<{}, IAppState> {
 
     render() {
         const { isLoading, items, sortOrder, sortField } = this.state;
-
-        const itemRenderer = (item: ISearchItem) => (
-            <div>
-                <h4>{item.id}</h4>
-                <h5>{item.name}</h5>
-                <hr />
-            </div>
-        );
+        const accountNo = items.length > 0 ? items[0].accountNo : undefined;
 
         return (
-            <div className="p-grid">
+            <div className="p-grid pt-5 pb-5">
+                <Growl ref={el => (this.growl = el)}></Growl>
                 <div className="p-sm-12 p-md-12 p-lg-6 p-lg-offset-3">
                     {isLoading ? (
                         <div className="text-center pt-5 pb-5">
@@ -109,17 +124,39 @@ class App extends React.Component<{}, IAppState> {
                             />
                         </div>
                     ) : (
-                        <DataView
-                            header={this.renderHeader()}
-                            value={items}
-                            layout="list"
-                            itemTemplate={itemRenderer}
-                            paginatorPosition={'both'}
-                            paginator={true}
-                            rows={10}
-                            sortOrder={sortOrder}
-                            sortField={sortField}
-                        />
+                        <>
+                            <div className="p-grid pt-5 pb-5">
+                                <div className="p-col-12">
+                                    <Breadcrumb size="big">
+                                        <Breadcrumb.Section link>
+                                            Home
+                                        </Breadcrumb.Section>
+                                        <Breadcrumb.Divider icon="right chevron" />
+                                        <Breadcrumb.Section>
+                                            Account Statement
+                                        </Breadcrumb.Section>
+                                        <Breadcrumb.Divider icon="right arrow" />
+                                        <Breadcrumb.Section active>
+                                            {accountNo}
+                                        </Breadcrumb.Section>
+                                    </Breadcrumb>
+                                </div>
+                            </div>
+                            <div className="p-grid">
+                                <DataView
+                                    className="w-full"
+                                    header={this.renderHeader()}
+                                    value={items}
+                                    layout="list"
+                                    itemTemplate={SearchListItem}
+                                    paginatorPosition={'both'}
+                                    paginator={true}
+                                    rows={10}
+                                    sortOrder={sortOrder}
+                                    sortField={sortField}
+                                />
+                            </div>
+                        </>
                     )}
                 </div>
             </div>

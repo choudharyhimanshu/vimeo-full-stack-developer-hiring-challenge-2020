@@ -1,4 +1,6 @@
 import { ISearchItem } from '../models/search-item';
+import to from 'await-to-js';
+import { ISearchResponse } from '../models/search-response';
 
 class SearchService {
     private apiBase: string;
@@ -31,10 +33,41 @@ class SearchService {
             method: 'GET'
         });
 
-        return response && response.ok
-            ? response.json()
-            : SearchService.handleErrorResponse(response);
+        return new Promise<ISearchItem[]>(async (resolve, reject) => {
+            if (response && response.ok) {
+                const [error, responseBody] = await to<ISearchResponse[]>(
+                    response.json()
+                );
+
+                if (responseBody) {
+                    resolve(
+                        responseBody.map((item, index) => {
+                            return {
+                                accountNo: item['Account No'],
+                                transactionDate: new Date(item['Date']),
+                                transactionDetails: item['Transaction Details'],
+                                valueDate: new Date(item['Value Date']),
+                                withdrawAmount: Number(
+                                    item['Withdrawal AMT'].replace(/,/g, '')
+                                ),
+                                depositAmount: Number(
+                                    item['Deposit AMT'].replace(/,/g, '')
+                                ),
+                                balanceAmount: Number(
+                                    item['Balance AMT'].replace(/,/g, '')
+                                )
+                            };
+                        })
+                    );
+                } else {
+                    reject(error);
+                }
+            } else {
+                reject(SearchService.handleErrorResponse(response));
+            }
+        });
     }
 }
 
-export default new SearchService('https://jsonplaceholder.typicode.com/users');
+// export default new SearchService('http://localhost:3000/bankAccount.json');
+export default new SearchService('http://starlord.hackerearth.com/bankAccount');

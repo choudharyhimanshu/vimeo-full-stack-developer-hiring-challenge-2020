@@ -27,9 +27,7 @@ class SearchService {
     }
 
     async fetchAllItems(): Promise<ISearchItem[]> {
-        const url = new URL(`${this.apiBase}`);
-
-        const response = await fetch(url.toString(), {
+        const response = await fetch(this.apiBase, {
             method: 'GET'
         });
 
@@ -69,5 +67,5 @@ class SearchService {
     }
 }
 
-// export default new SearchService('http://localhost:3000/bankAccount.json');
+// export default new SearchService('bankAccount.json');
 export default new SearchService('http://starlord.hackerearth.com/bankAccount');

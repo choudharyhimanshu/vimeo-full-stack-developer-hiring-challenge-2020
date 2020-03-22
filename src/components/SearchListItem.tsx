@@ -10,7 +10,7 @@ const SearchListItem = (item: ISearchItem) => {
         item && (
             <Item className="pt-2 pl-2 pr-2">
                 <Item.Content>
-                    <Item.Header as="h3">
+                    <Item.Header as="h3" className="xs-h3">
                         {item.transactionDetails}
                         <Label className="pull-right" basic>
                             <Moment date={item.transactionDate} format="LL" />

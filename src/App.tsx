@@ -17,6 +17,7 @@ import { ISearchItem } from './models/search-item';
 
 import searchService from './services/search.service';
 import SearchListItem from './components/SearchListItem';
+import StatementChart from './components/StatementChart';
 import { Breadcrumb } from 'semantic-ui-react';
 
 interface IAppState {
@@ -104,6 +105,9 @@ class App extends React.Component<{}, IAppState> {
                         onChange={this.onSortChange}
                     />
                 </div>
+                <div className="p-col-6 pt-2" style={{ textAlign: 'right' }}>
+                    Total transactions: {this.state.items.length}
+                </div>
             </div>
         );
     }
@@ -115,34 +119,34 @@ class App extends React.Component<{}, IAppState> {
         return (
             <div className="p-grid pt-5 pb-5">
                 <Growl ref={el => (this.growl = el)}></Growl>
-                <div className="p-sm-12 p-md-12 p-lg-6 p-lg-offset-3">
-                    {isLoading ? (
-                        <div className="text-center pt-5 pb-5">
-                            <ProgressSpinner
-                                style={{ width: '50px', height: '50px' }}
-                                strokeWidth="5"
-                            />
-                        </div>
-                    ) : (
-                        <>
-                            <div className="p-grid pt-5 pb-5">
-                                <div className="p-col-12">
-                                    <Breadcrumb size="big">
-                                        <Breadcrumb.Section link>
-                                            Home
-                                        </Breadcrumb.Section>
-                                        <Breadcrumb.Divider icon="right chevron" />
-                                        <Breadcrumb.Section>
-                                            Account Statement
-                                        </Breadcrumb.Section>
-                                        <Breadcrumb.Divider icon="right arrow" />
-                                        <Breadcrumb.Section active>
-                                            {accountNo}
-                                        </Breadcrumb.Section>
-                                    </Breadcrumb>
-                                </div>
+                {isLoading ? (
+                    <div className="p-col-12 text-center pt-5 pb-5">
+                        <ProgressSpinner
+                            style={{ width: '50px', height: '50px' }}
+                            strokeWidth="5"
+                        />
+                    </div>
+                ) : (
+                    <div className="p-col-12">
+                        <div className="p-grid pt-5 pb-5">
+                            <div className="p-sm-12 p-md-12 p-lg-6 p-lg-offset-1 pl-2 pr-2">
+                                <Breadcrumb size="big">
+                                    <Breadcrumb.Section link>
+                                        Home
+                                    </Breadcrumb.Section>
+                                    <Breadcrumb.Divider icon="right chevron" />
+                                    <Breadcrumb.Section>
+                                        Account Statement
+                                    </Breadcrumb.Section>
+                                    <Breadcrumb.Divider icon="right arrow" />
+                                    <Breadcrumb.Section active>
+                                        {accountNo}
+                                    </Breadcrumb.Section>
+                                </Breadcrumb>
                             </div>
-                            <div className="p-grid">
+                        </div>
+                        <div className="p-grid">
+                            <div className="p-xs-12 p-sm-12 p-md-12 p-lg-6 p-lg-offset-1">
                                 <DataView
                                     className="w-full"
                                     header={this.renderHeader()}
@@ -156,9 +160,12 @@ class App extends React.Component<{}, IAppState> {
                                     sortField={sortField}
                                 />
                             </div>
-                        </>
-                    )}
-                </div>
+                            <div className="p-xs-12 p-sm-12 p-md-12 p-lg-4 pl-2 pr-2">
+                                <StatementChart items={items} />
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
